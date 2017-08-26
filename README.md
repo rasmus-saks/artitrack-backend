@@ -1,4 +1,4 @@
-# Artitrack Backend
+# Artitrack Backend [![Build Status](https://travis-ci.org/rasmussaks/artitrack-backend.svg?branch=master)](https://travis-ci.org/rasmussaks/artitrack-backend)
 This is the backend API server that runs Artitrack.
 
 # Running
