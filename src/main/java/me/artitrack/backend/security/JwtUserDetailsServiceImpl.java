@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,11 +22,11 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
   }
 
   @Override
-  public UserDetails loadUserByUsername(String steam64) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String steam64) {
     User user = userRepository.findOneBySteam64(steam64);
 
     if (user == null) {
-      LOG.info("Created new user with steam64 " + steam64);
+      LOG.info("Created new user with steam64 %s", steam64);
       user = userRepository.save(new User(steam64));
     }
     return JwtUserFactory.create(user);

@@ -29,7 +29,7 @@ public class SteamApiService {
         builder().queryParam("steamids", steam64).buildAndExpand("ISteamUser", "GetPlayerSummaries", "v2");
     SteamPlayerSummariesResponse response = restTemplate.getForObject(uri.toUri(), SteamPlayerSummariesResponse.class);
     if (response == null || response.getResponse() == null || response.getResponse().getPlayers() == null
-        || response.getResponse().getPlayers().size() == 0) {
+        || response.getResponse().getPlayers().isEmpty()) {
       return null;
     }
     return CompletableFuture.completedFuture(response.getResponse().getPlayers().get(0));

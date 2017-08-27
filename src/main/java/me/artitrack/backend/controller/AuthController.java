@@ -83,7 +83,7 @@ public class AuthController {
       String steam64 = verified.getIdentifier().substring(OPENID_ID_PREFIX.length());
       UserDetails details = userDetailsService.loadUserByUsername(steam64);
       String token = jwtTokenUtil.generateToken(details);
-      steamApiService.getSteamUser(details.getUsername()).thenAccept((user) -> LOG.debug(user.getPersonaname()));
+      steamApiService.getSteamUser(details.getUsername()).thenAccept(user -> LOG.debug(user.getPersonaname()));
       return Response.ok(new JwtAuthenticationResponse(token)).cookie(jwtTokenUtil.getCookieFromToken(token)).build();
     }
     return Response.status(Response.Status.UNAUTHORIZED).build();
