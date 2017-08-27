@@ -2,3 +2,6 @@ language: java
 addons:
   sonarcloud:
     organization: "rasmussaks-github"
+
+script:
+  - sonar-scanner
