@@ -40,7 +40,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
       id = null;
     }
 
-    LOG.info("Checking authentication for user %s", id);
+    LOG.trace("Checking authentication for user {}", id);
 
     if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       try {
@@ -49,8 +49,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
           UsernamePasswordAuthenticationToken authentication =
               new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
           authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-          LOG.info("Authenticated user %s, setting security context ", id);
           SecurityContextHolder.getContext().setAuthentication(authentication);
+          LOG.trace("Authenticated user {}, set security context ", id);
         }
 
       } catch (UsernameNotFoundException e) {
@@ -60,7 +60,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
 
     }
-
     chain.doFilter(request, response);
   }
 
