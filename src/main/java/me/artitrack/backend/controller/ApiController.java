@@ -11,6 +11,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 
 @Component
@@ -50,8 +51,12 @@ public class ApiController {
 
   @GET
   @Path("steam64/{steam64}")
-  public User getUserBySteam64(@PathParam("steam64") String steam64) {
-    return userRepository.findOneBySteam64(steam64);
+  public Response getUserBySteam64(@PathParam("steam64") String steam64) {
+    User user = userRepository.findOne(steam64);
+    if (user == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    return Response.ok(user).build();
   }
 
 
