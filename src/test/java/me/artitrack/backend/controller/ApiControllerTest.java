@@ -12,7 +12,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
 
   @Test
   public void testUnauthorized() throws Exception {
-    get("/api/steam64/" + TEST_USER_STEAM64)
+    get("/api/user/" + TEST_USER_STEAM64)
         .then()
         .statusCode(HttpStatus.SC_UNAUTHORIZED);
   }
@@ -20,7 +20,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
   @Test
   public void testAuthorized() throws Exception {
     authed()
-        .get("/api/steam64/" + TEST_USER_STEAM64)
+        .get("/api/user/" + TEST_USER_STEAM64)
         .then()
         .statusCode(HttpStatus.SC_OK)
         .body("steam64", is(TEST_USER_STEAM64));
@@ -29,7 +29,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
   @Test
   public void testInvalidSteam64() throws Exception {
     authed()
-        .get("/api/steam64/1123")
+        .get("/api/user/1123")
         .then()
         .statusCode(HttpStatus.SC_NOT_FOUND);
   }
@@ -38,7 +38,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
   public void testCookieAuthentication() throws Exception {
     given()
         .cookie("auth-token", getToken()).
-        get("/api/steam64/" + TEST_USER_STEAM64)
+        get("/api/user/" + TEST_USER_STEAM64)
         .then()
         .statusCode(HttpStatus.SC_OK)
         .body("steam64", is(TEST_USER_STEAM64));
