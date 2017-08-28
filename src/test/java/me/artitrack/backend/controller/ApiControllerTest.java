@@ -43,4 +43,12 @@ public class ApiControllerTest extends BaseIntegrationTest {
         .statusCode(HttpStatus.SC_OK)
         .body("steam64", is(TEST_USER_STEAM64));
   }
+
+  @Test
+  public void testLoggedUser() throws Exception {
+    authed()
+        .get("/api/user")
+        .then()
+        .body("steam64", is(TEST_USER_STEAM64));
+  }
 }

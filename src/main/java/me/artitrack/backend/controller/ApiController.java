@@ -3,7 +3,9 @@ package me.artitrack.backend.controller;
 import me.artitrack.backend.Greeting;
 import me.artitrack.backend.model.User;
 import me.artitrack.backend.repository.UserRepository;
+import me.artitrack.backend.security.JwtUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -37,6 +39,12 @@ public class ApiController {
     return userRepository.findAll();
   }
 
+  @GET
+  @Path("user")
+  public User getLoggedUser() {
+    JwtUser user = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return user.getUser();
+  }
   @GET
   @Path("user/{id}")
   public User getUser(@PathParam("id") String id) {

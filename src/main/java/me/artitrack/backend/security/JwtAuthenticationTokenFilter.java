@@ -4,7 +4,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -46,9 +45,10 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
       try {
         JwtUser userDetails = this.userService.loadUserBySteam64(id);
         if (jwtTokenUtil.validateToken(authToken, userDetails)) {
-          UsernamePasswordAuthenticationToken authentication =
-              new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+          JwtAuthenticationToken authentication = new JwtAuthenticationToken(authToken, userDetails);
+          authentication.setAuthenticated(true);
           authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
           SecurityContextHolder.getContext().setAuthentication(authentication);
           LOG.trace("Authenticated user {}, set security context ", id);
         }
