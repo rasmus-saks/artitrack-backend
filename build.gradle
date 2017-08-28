@@ -50,6 +50,9 @@ pmd {
 }
 test {
     finalizedBy jacocoTestReport
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
 
 compileJava.dependsOn(processResources)
