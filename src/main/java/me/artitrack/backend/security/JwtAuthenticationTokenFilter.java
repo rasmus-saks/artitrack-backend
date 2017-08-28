@@ -66,10 +66,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
   private String getTokenFromRequest(HttpServletRequest request) {
     String authToken = "";
-    for (Cookie cookie : request.getCookies()) {
-      if (cookie.getName().equals(jwtTokenUtil.getTokenCookieName())) {
-        authToken = cookie.getValue();
-        break;
+    if (request.getCookies() != null) {
+      for (Cookie cookie : request.getCookies()) {
+        if (cookie.getName().equals(jwtTokenUtil.getTokenCookieName())) {
+          authToken = cookie.getValue();
+          break;
+        }
       }
     }
     // Allow header token to override cookie
