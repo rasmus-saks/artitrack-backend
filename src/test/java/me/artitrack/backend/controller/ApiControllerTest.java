@@ -1,5 +1,6 @@
 package me.artitrack.backend.controller;
 
+import io.restassured.RestAssured;
 import me.artitrack.backend.BaseIntegrationTest;
 import me.artitrack.backend.model.User;
 import me.artitrack.backend.repository.UserRepository;
@@ -10,6 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import static io.restassured.RestAssured.get;
@@ -18,6 +20,9 @@ import static org.hamcrest.Matchers.is;
 
 public class ApiControllerTest extends BaseIntegrationTest {
   private static final String TEST_USER_STEAM64 = "1234567";
+
+  @Value("${local.server.port}")
+  private int port;
 
   @Autowired
   private JwtTokenUtil tokenUtil;
@@ -48,6 +53,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
 
   @Before
   public void setUp() throws Exception {
+    RestAssured.port = port;
     user = userRepository.save(user);
   }
 
