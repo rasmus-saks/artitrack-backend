@@ -41,6 +41,7 @@ dependencies {
     runtime('org.postgresql:postgresql')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
+    testCompile 'io.rest-assured:rest-assured:3.0.3'
 }
 
 pmd {
