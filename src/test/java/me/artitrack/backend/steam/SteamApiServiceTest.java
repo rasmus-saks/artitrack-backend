@@ -1,13 +1,13 @@
 package me.artitrack.backend.steam;
 
-import me.artitrack.backend.BaseTest;
+import me.artitrack.backend.BaseServiceTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SteamApiServiceTest extends BaseTest {
+public class SteamApiServiceTest extends BaseServiceTest {
 
   private static final String TEST_USER_STEAM64 = "76561198015149576";
   @Autowired
