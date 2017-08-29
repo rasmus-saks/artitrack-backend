@@ -1,9 +1,12 @@
 package me.artitrack.backend.controller;
 
+import io.jsonwebtoken.JwtException;
 import me.artitrack.backend.config.ServerConfig;
 import me.artitrack.backend.security.JwtAuthenticationResponse;
 import me.artitrack.backend.security.JwtTokenUtil;
+import me.artitrack.backend.security.JwtUserService;
 import me.artitrack.backend.steam.SteamApiService;
+import org.apache.http.HttpStatus;
 import org.openid4java.association.AssociationException;
 import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
@@ -20,11 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -40,16 +46,18 @@ public class AuthController {
   private final UserDetailsService userDetailsService;
   private final JwtTokenUtil jwtTokenUtil;
   private final SteamApiService steamApiService;
+  private final JwtUserService jwtUserService;
   private final DiscoveryInformation discovered;
 
 
   @Autowired
   public AuthController(ServerConfig serverConfig, UserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil,
-                        SteamApiService steamApiService) throws DiscoveryException {
+                        SteamApiService steamApiService, JwtUserService jwtUserService) throws DiscoveryException {
     this.serverConfig = serverConfig;
     this.userDetailsService = userDetailsService;
     this.jwtTokenUtil = jwtTokenUtil;
     this.steamApiService = steamApiService;
+    this.jwtUserService = jwtUserService;
     List list = manager.discover("https://steamcommunity.com/openid");
     manager.setMaxAssocAttempts(0);
     discovered = manager.associate(list);
@@ -57,15 +65,30 @@ public class AuthController {
 
   @Path("login")
   @GET
-  public Response login() throws MessageException, ConsumerException {
-    AuthRequest authReq = manager.authenticate(discovered, serverConfig.getBaseUrl() + "auth/return");
+  public Response login(@QueryParam("return_to") String returnTo) throws MessageException, ConsumerException {
+    UriComponents components = UriComponentsBuilder.fromHttpUrl(serverConfig.getBaseUrl() + "auth/return")
+        .queryParam("return_to", returnTo).build();
+    AuthRequest authReq = manager.authenticate(discovered, components.toUriString());
     return Response.seeOther(URI.create(authReq.getDestinationUrl(true))).build();
+  }
+
+  @Path("validateToken")
+  @GET
+  @Produces("application/json")
+  public Response validateToken(@QueryParam("token") String token) {
+    try {
+      String steam64 = jwtTokenUtil.getIdFromToken(token);
+      return Response.ok(jwtUserService.loadUserBySteam64(steam64).getUser()).build();
+    } catch (JwtException ex) {
+      LOG.info("Failed to validate JWT token {}", token);
+      return Response.status(HttpStatus.SC_UNAUTHORIZED).build();
+    }
   }
 
   @Path("return")
   @GET
   @Produces("application/json")
-  public Response returned(@Context HttpServletRequest request)
+  public Response returned(@Context HttpServletRequest request, @QueryParam("return_to") String returnTo)
       throws AssociationException, DiscoveryException, MessageException {
     ParameterList openidResp = new ParameterList(request.getParameterMap());
     StringBuffer receivingURL = request.getRequestURL();
@@ -84,6 +107,11 @@ public class AuthController {
       UserDetails details = userDetailsService.loadUserByUsername(steam64);
       String token = jwtTokenUtil.generateToken(details);
       steamApiService.getSteamUser(details.getUsername()).thenAccept(user -> LOG.debug(user.getPersonaname()));
+      if (returnTo != null && !returnTo.isEmpty()) {
+        // Add 'token' query parameter to return URL
+        UriComponents returnComponents = UriComponentsBuilder.fromHttpUrl(returnTo).queryParam("token", token).build();
+        return Response.seeOther(returnComponents.toUri()).cookie(jwtTokenUtil.getCookieFromToken(token)).build();
+      }
       return Response.ok(new JwtAuthenticationResponse(token)).cookie(jwtTokenUtil.getCookieFromToken(token)).build();
     }
     return Response.status(Response.Status.UNAUTHORIZED).build();
