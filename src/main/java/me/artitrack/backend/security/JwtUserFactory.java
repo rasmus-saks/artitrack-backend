@@ -7,6 +7,8 @@ public class JwtUserFactory {
   }
 
   public static JwtUser create(User user) {
+    if (user == null)
+      throw new IllegalArgumentException("user cannot be null");
     return new JwtUser(user);
 
   }

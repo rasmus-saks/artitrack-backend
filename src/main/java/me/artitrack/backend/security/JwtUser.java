@@ -14,6 +14,8 @@ public class JwtUser implements UserDetails {
   private final Collection<GrantedAuthority> authorities = new ArrayList<>();
 
   public JwtUser(User user) {
+    if (user == null)
+      throw new IllegalArgumentException("user cannot be null");
     this.user = user;
     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
   }

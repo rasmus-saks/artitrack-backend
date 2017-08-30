@@ -1,24 +1,23 @@
-package me.artitrack.backend.controller;
+package me.artitrack.backend.endpoint;
 
 import me.artitrack.backend.BaseIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.is;
 
-public class ApiControllerTest extends BaseIntegrationTest {
+public class Api extends BaseIntegrationTest {
 
   @Test
-  public void testUnauthorized() throws Exception {
+  public void user_WhenNotLoggedIn_Rejected() throws Exception {
     get("/api/user/" + TEST_USER_STEAM64)
         .then()
         .statusCode(HttpStatus.SC_UNAUTHORIZED);
   }
 
   @Test
-  public void testAuthorized() throws Exception {
+  public void user_WhenLoggedIn_ReturnsRequestedUser() throws Exception {
     authed()
         .get("/api/user/" + TEST_USER_STEAM64)
         .then()
@@ -27,7 +26,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInvalidSteam64() throws Exception {
+  public void user_InvalidSteam64_Rejected() throws Exception {
     authed()
         .get("/api/user/1123")
         .then()
@@ -35,7 +34,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCookieAuthentication() throws Exception {
+  public void user_AuthTokenCookie_Accepted() throws Exception {
     given()
         .cookie("auth-token", getToken()).
         get("/api/user/" + TEST_USER_STEAM64)
@@ -45,7 +44,7 @@ public class ApiControllerTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLoggedUser() throws Exception {
+  public void user_WithoutParams_ReturnsLoggedInUser() throws Exception {
     authed()
         .get("/api/user")
         .then()

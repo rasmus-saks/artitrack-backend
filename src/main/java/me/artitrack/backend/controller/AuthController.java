@@ -2,11 +2,11 @@ package me.artitrack.backend.controller;
 
 import io.jsonwebtoken.JwtException;
 import me.artitrack.backend.config.ServerConfig;
+import me.artitrack.backend.response.TokenValidationResponse;
 import me.artitrack.backend.security.JwtAuthenticationResponse;
 import me.artitrack.backend.security.JwtTokenUtil;
 import me.artitrack.backend.security.JwtUserService;
 import me.artitrack.backend.steam.SteamApiService;
-import org.apache.http.HttpStatus;
 import org.openid4java.association.AssociationException;
 import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
@@ -75,13 +75,13 @@ public class AuthController {
   @Path("validateToken")
   @GET
   @Produces("application/json")
-  public Response validateToken(@QueryParam("token") String token) {
+  public TokenValidationResponse validateToken(@QueryParam("token") String token) {
     try {
       String steam64 = jwtTokenUtil.getIdFromToken(token);
-      return Response.ok(jwtUserService.loadUserBySteam64(steam64).getUser()).build();
-    } catch (JwtException ex) {
+      return new TokenValidationResponse(jwtUserService.loadUserBySteam64(steam64).getUser());
+    } catch (JwtException | IllegalArgumentException ex) {
       LOG.info("Failed to validate JWT token {}", token);
-      return Response.status(HttpStatus.SC_UNAUTHORIZED).build();
+      return new TokenValidationResponse(null);
     }
   }
 

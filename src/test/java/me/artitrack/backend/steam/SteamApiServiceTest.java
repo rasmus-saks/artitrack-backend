@@ -4,8 +4,7 @@ import me.artitrack.backend.BaseServiceTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class SteamApiServiceTest extends BaseServiceTest {
 
@@ -14,7 +13,7 @@ public class SteamApiServiceTest extends BaseServiceTest {
   private SteamApiService steamApiService;
 
   @Test
-  public void successfulSteamUser() throws Exception {
+  public void getSteamUser_ValidSteamUser_ShouldGiveAllDetails() throws Exception {
     SteamUser user = steamApiService.getSteamUser(TEST_USER_STEAM64).join();
     assertNotNull(user);
     assertNotNull(user.getAvatar());
@@ -26,7 +25,7 @@ public class SteamApiServiceTest extends BaseServiceTest {
   }
 
   @Test(expected = SteamResponseException.class)
-  public void failedSteamUser() throws Exception {
+  public void getSteamUser_InvalidSteamUser_ShouldThrowException() throws Exception {
     steamApiService.getSteamUser("123").join();
   }
 }
