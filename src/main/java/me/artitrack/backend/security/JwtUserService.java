@@ -22,4 +22,8 @@ public class JwtUserService {
     }
     return new JwtUser(user);
   }
+
+  public void saveJwtUser(JwtUser user) {
+    user.setUser(userRepository.save(user.getUser()));
+  }
 }

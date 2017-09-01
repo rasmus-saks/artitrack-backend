@@ -2,9 +2,11 @@ package me.artitrack.backend.controller;
 
 import io.jsonwebtoken.JwtException;
 import me.artitrack.backend.config.ServerConfig;
+import me.artitrack.backend.model.User;
 import me.artitrack.backend.response.TokenValidationResponse;
 import me.artitrack.backend.security.JwtAuthenticationResponse;
 import me.artitrack.backend.security.JwtTokenUtil;
+import me.artitrack.backend.security.JwtUser;
 import me.artitrack.backend.security.JwtUserService;
 import me.artitrack.backend.steam.SteamApiService;
 import org.openid4java.association.AssociationException;
@@ -104,9 +106,14 @@ public class AuthController {
     Identifier verified = verification.getVerifiedId();
     if (verified != null) {
       String steam64 = verified.getIdentifier().substring(OPENID_ID_PREFIX.length());
-      UserDetails details = userDetailsService.loadUserByUsername(steam64);
+      JwtUser details = (JwtUser) userDetailsService.loadUserByUsername(steam64);
       String token = jwtTokenUtil.generateToken(details);
-      steamApiService.getSteamUser(details.getUsername()).thenAccept(user -> LOG.debug(user.getPersonaname()));
+      steamApiService.getSteamUser(details.getUsername()).thenAccept(user -> {
+        User usr = details.getUser();
+        usr.setNickname(user.getPersonaname());
+        usr.setAvatarUrl(user.getAvatar());
+        jwtUserService.saveJwtUser(details);
+      });
       if (returnTo != null && !returnTo.isEmpty()) {
         // Add 'token' query parameter to return URL
         UriComponents returnComponents = UriComponentsBuilder.fromHttpUrl(returnTo).queryParam("token", token).build();

@@ -27,7 +27,7 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
 
     if (user == null) {
       LOG.info("Created new user with steam64 %s", steam64);
-      user = userRepository.save(new User(steam64));
+      user = userRepository.save(new User(steam64, "", ""));
     }
     return JwtUserFactory.create(user);
   }

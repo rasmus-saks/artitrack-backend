@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class JwtUserFactoryTest extends BaseTest {
   @Test
   public void create_GivenValidUser_ReturnsValidUser() throws Exception {
-    JwtUser user = JwtUserFactory.create(new User("1234"));
+    JwtUser user = JwtUserFactory.create(new User("1234", "nickname", "avatar"));
     assertNotNull(user);
     assertEquals("1234", user.getUsername());
   }

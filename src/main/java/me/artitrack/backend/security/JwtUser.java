@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public class JwtUser implements UserDetails {
   private static final long serialVersionUID = 6823517710205917477L;
-  private final User user;
+  private User user;
   private final Collection<GrantedAuthority> authorities = new ArrayList<>();
 
   public JwtUser(User user) {
@@ -22,6 +22,10 @@ public class JwtUser implements UserDetails {
 
   public User getUser() {
     return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
   }
 
   public Collection<GrantedAuthority> getAuthorities() {
